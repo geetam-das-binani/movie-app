@@ -3,8 +3,9 @@ import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import AddMovieDialog from "./AddMovieDialog";
 import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
+import ProfileMenu from "./ProfileMenu";
 
-export default function Movies() {
+export default function Movies({ user }: { user: any }) {
   const [movies, setMovies] = useState<any[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -144,10 +145,32 @@ export default function Movies() {
       {/* Header */}
       <header className="bg-indigo-600 text-white py-4 shadow-md">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-wide">
+          <h1 className="text-2xl font-bold tracking-wide flex items-center gap-2">
             🎥 Movie Dashboard
           </h1>
-          <AddMovieDialog refetch={refetch} />
+
+          <div className="flex items-center gap-3">
+           
+           
+              <AddMovieDialog refetch={refetch} />
+            
+
+            
+            {user && (
+              <div className="bg-white rounded-lg shadow-sm">
+                <ProfileMenu
+                  user={user}
+                  onLogout={async () => {
+                    await fetch("http://localhost:8000/api/auth/logout", {
+                      method: "POST",
+                      credentials: "include",
+                    });
+                    window.location.href = "/login";
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </header>
 

@@ -30,6 +30,8 @@ const DeleteModal = ({
       setLoading(true);
       const res = await fetch(`http://localhost:8000/api/movies/${movieId}`, {
         method: "DELETE",
+        credentials: "include",
+       
       });
 
       if (!res.ok) throw new Error("Failed to delete movie");

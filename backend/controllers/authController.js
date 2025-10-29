@@ -18,8 +18,24 @@ export const register = async (req, res) => {
     const user = await prisma.user.create({
       data: { name, email, password: hashedPassword },
     });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    res.status(201).json({ message: "User registered successfully", user });
+    res.cookie("auth-token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(201).json({ message: "User registered successfully", user:{
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -51,7 +67,13 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ message: "Login successful", user });
+    res.status(200).json({ message: "Login successful", user:{
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -62,7 +84,7 @@ export const login = async (req, res) => {
  * Logout user (clear cookie)
  */
 export const logout = async (req, res) => {
-  res.clearCookie("auth_token", {
+  res.clearCookie("auth-token", {
     httpOnly: true,
     sameSite: "none",
     secure: true,
@@ -72,7 +94,16 @@ export const logout = async (req, res) => {
 export const getProfileDetails = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        id: true,
+      },
+    });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

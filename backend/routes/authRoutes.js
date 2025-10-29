@@ -5,11 +5,15 @@ import {
   logout,
   getProfileDetails,
 } from "../controllers/authController.js";
-import {authMiddleware} from '../middleware/authMiddleware.js'
+import { authMiddleware } from "../middleware/authMiddleware.js";
+import {
+  validateAuthLogin,
+  validateAuthRegister,
+} from "../validation/authValidation.js";
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", validateAuthRegister, register);
+router.post("/login", validateAuthLogin, login);
 router.post("/logout", logout);
 router.get("/profile", authMiddleware, getProfileDetails);
 

@@ -54,6 +54,7 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
           duration: parseInt(movie.duration),
           releaseYear: parseInt(movie.releaseYear),
         }),
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -61,8 +62,11 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
         alert("✅ Movie added successfully!");
       } else {
         const errorData = await response.json();
+        const errors = errorData.errors
+          ? errorData.errors.map((err: any) => err.message).join("\n")
+          : "";
         alert(
-          `❌ Failed to add movie: ${errorData.message || "Unknown error"}`
+          `❌ Failed to add movie: ${errors || "Unknown error"}`
         );
       }
     } catch (error) {

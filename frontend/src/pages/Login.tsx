@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-
-export default function Login() {
+import { toast } from "react-toastify";
+export default function Login({ setUser }: { setUser: (user: any) => void }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -18,21 +18,25 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/login", {
+      const res = await fetch("http://localhost:8000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
+        credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Login successful!");
+        toast.success("Login successful!");
+        setUser(data.user);
         navigate("/");
       } else {
-        alert(data.message || "Login failed!");
+        const errors = data.errors
+          ? data.errors.map((err: any) => err.message).join("\n")
+          : "";
+        toast.error(errors || "Login failed!");
       }
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong!");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

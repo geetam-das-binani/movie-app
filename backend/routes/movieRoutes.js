@@ -5,13 +5,13 @@ import {
   deleteMovie,
   getMovies,
   updateMovie,
-} from "../controllers/movieController.js"
-// const authMiddleware = require('../middleware/authMiddleware');
+} from "../controllers/movieController.js";
+import { validateMovie } from "../validation/movieValidation.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
-router.post("/", createMovie);
-router.get("/", getMovies);
-router.put("/:id", updateMovie);
-router.delete("/:id", deleteMovie);
-
+router.post("/", authMiddleware, validateMovie, createMovie);
+router.get("/", authMiddleware, getMovies);
+router.put("/:id", authMiddleware, validateMovie, updateMovie);
+router.delete("/:id", authMiddleware, deleteMovie);
 
 export default router;

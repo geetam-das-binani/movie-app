@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
-export default function Register() {
+export default function Register({ setUser }: { setUser: (user: any) => void }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -18,17 +18,22 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/register", {
+      const res = await fetch("http://localhost:8000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
+        credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
         alert("Registration successful!");
-        navigate("/login");
+         setUser(data.user);
+        navigate("/");
       } else {
-        alert(data.message || "Registration failed!");
+        const errors = data.errors
+          ? data.errors.map((err: any) => err.message).join("\n")
+          : "";
+        alert(errors || "Registration failed!");
       }
     } catch (error) {
       console.error(error);

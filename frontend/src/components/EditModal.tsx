@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Edit } from "lucide-react";
 
 const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
   const [open, setOpen] = useState(false);
@@ -61,6 +62,7 @@ const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
             duration: parseInt(editMovie.duration),
             releaseYear: parseInt(editMovie.releaseYear),
           }),
+          credentials: "include",
         }
       );
 
@@ -97,7 +99,7 @@ const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
-          Edit Movie
+          <Edit />
         </Button>
       </DialogTrigger>
 
