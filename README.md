@@ -42,7 +42,7 @@ npm or yarn
 git clone https://github.com/yourusername/movie-dashboard.git
 cd movie-dashboard
 
-2. Backend Setup
+# Backend Setup
 cd backend
 npm install
 
@@ -64,7 +64,7 @@ Start the backend server
 npm run dev
 
 
-. Frontend Setup
+# Frontend Setup
 cd ../frontend
 npm install
 
