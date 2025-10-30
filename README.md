@@ -1,4 +1,4 @@
-🎬 Movie Management Dashboard
+#  Movie Management Dashboard
 
 A full-stack Movie Management application built with React (Vite + TypeScript) on the frontend and Node.js, Express, Prisma, and Zod on the backend.
 Users can add, edit, delete, and view movies, with authentication and image URL support.
@@ -68,7 +68,8 @@ npm run dev
 cd ../frontend
 npm install
 
-Create .env file inside frontend/
+Create .env file inside frontend
+
 VITE_APP_HOST=backendhost
 
 
