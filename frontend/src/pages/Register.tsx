@@ -1,43 +1,54 @@
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterType } from "@/types/schema";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
-export default function Register({ setUser }: { setUser: (user: any) => void }) {
+export default function Register({
+  setUser,
+}: {
+  setUser: (user: any) => void;
+}) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<RegisterType>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (formData: RegisterType) => {
+    console.log(formData);
     setLoading(true);
     try {
       const res = await fetch("http://localhost:8000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(formData),
         credentials: "include",
       });
       const data = await res.json();
+
       if (res.ok) {
-        alert("Registration successful!");
-         setUser(data.user);
+        toast.success("Registration successful!");
+        setUser(data.user);
         navigate("/");
+        reset();
       } else {
-        const errors = data.errors
-          ? data.errors.map((err: any) => err.message).join("\n")
-          : "";
-        alert(errors || "Registration failed!");
+        toast.error(data.message || "Registration failed!");
       }
     } catch (error) {
       console.error(error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -55,31 +66,35 @@ export default function Register({ setUser }: { setUser: (user: any) => void }) 
           </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
               <label className="text-sm font-medium text-gray-700">Name</label>
               <Input
                 type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
                 placeholder="Enter your name"
+                {...register("name")}
                 className="mt-1"
-                required
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="text-sm font-medium text-gray-700">Email</label>
               <Input
                 type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
                 placeholder="Enter your email"
+                {...register("email")}
                 className="mt-1"
-                required
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -88,13 +103,15 @@ export default function Register({ setUser }: { setUser: (user: any) => void }) 
               </label>
               <Input
                 type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
                 placeholder="Enter your password"
+                {...register("password")}
                 className="mt-1"
-                required
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <Button

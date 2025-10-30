@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,70 +23,66 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { movieSchema, type MovieType } from "@/types/schema";
+import { toast } from "react-toastify";
 
 const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
-  const [movie, setMovie] = useState({
-    title: "",
-    type: "",
-    director: "",
-    budget: "",
-    location: "",
-    duration: "",
-    releaseYear: "",
-  });
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMovie({ ...movie, [e.target.name]: e.target.value });
-  };
 
-  const handleSelectChange = (value: string) => {
-    setMovie({ ...movie, type: value });
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<MovieType>({
+    resolver: zodResolver(movieSchema),
+    defaultValues: {
+      title: "",
+      type: "movie",
+      director: "",
+      budget: "",
+      location: "",
+      duration: "",
+      releaseYear: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const watchType = watch("type");
+  const onSubmit = async (formData: MovieType) => {
     setLoading(true);
-
     try {
       const response = await fetch("http://localhost:8000/api/movies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...movie,
-          budget: parseFloat(movie.budget),
-          duration: parseInt(movie.duration),
-          releaseYear: parseInt(movie.releaseYear),
+          ...formData,
+          budget: parseFloat(formData.budget),
+          duration: parseInt(formData.duration),
+          releaseYear: parseInt(formData.releaseYear),
         }),
         credentials: "include",
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         refetch();
-        alert("✅ Movie added successfully!");
+        toast.success("✅ Movie added successfully!");
+        reset();
+        setOpen(false);
       } else {
-        const errorData = await response.json();
-        const errors = errorData.errors
-          ? errorData.errors.map((err: any) => err.message).join("\n")
-          : "";
-        alert(
-          `❌ Failed to add movie: ${errors || "Unknown error"}`
-        );
+        const errors = data.errors
+          ? data.errors.map((err: any) => err.message).join("\n")
+          : data.message || "Unknown error";
+        toast.success(`❌ Failed to add movie: ${errors}`);
       }
     } catch (error) {
       console.error(error);
-      alert("⚠️ Something went wrong!");
+      toast.success("⚠️ Something went wrong!");
     } finally {
-      setMovie({
-        title: "",
-        type: "",
-        director: "",
-        budget: "",
-        location: "",
-        duration: "",
-        releaseYear: "",
-      });
-      setOpen(false);
       setLoading(false);
     }
   };
@@ -96,7 +96,7 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-lg">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Add New Movie</DialogTitle>
             <DialogDescription>
@@ -108,30 +108,32 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
             {/* Title */}
             <div className="grid gap-2">
               <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                value={movie.title}
-                onChange={handleChange}
-                required
-              />
+              <Input id="title" {...register("title")} />
+              {errors.title && (
+                <p className="text-red-500 text-xs">{errors.title.message}</p>
+              )}
             </div>
 
-            {/* Type (Select Dropdown) */}
+            {/* Type */}
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
-              <Select required onValueChange={handleSelectChange}>
-                <SelectTrigger id="type" className="w-full">
-                  <SelectValue
-                    placeholder="Select movie type"
-                    defaultValue={movie.type}
-                  />
+              <Select
+                value={watchType}
+                onValueChange={(value: string) =>
+                  setValue("type", value as MovieType["type"])
+                }
+              >
+                <SelectTrigger className="w-full" id="type">
+                  <SelectValue placeholder="Select movie type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="movie">Movie</SelectItem>
                   <SelectItem value="tvShow">TV Show</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.type && (
+                <p className="text-red-500 text-xs">{errors.type.message}</p>
+              )}
             </div>
 
             {/* Director */}
@@ -139,11 +141,22 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
               <Label htmlFor="director">Director</Label>
               <Input
                 id="director"
-                name="director"
-                value={movie.director}
-                onChange={handleChange}
-                required
+                {...register("director", {
+                  required: "Director is required",
+                  validate: (value) => {
+                    if (!isNaN(Number(value))) {
+                      return "Director name cannot be a number";
+                    }
+                    return true;
+                  },
+                })}
               />
+
+              {errors.director && (
+                <p className="text-red-500 text-xs">
+                  {errors.director.message}
+                </p>
+              )}
             </div>
 
             {/* Budget */}
@@ -151,38 +164,35 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
               <Label htmlFor="budget">Budget (in million USD)</Label>
               <Input
                 id="budget"
-                name="budget"
                 type="number"
                 step="0.01"
-                value={movie.budget}
-                onChange={handleChange}
-                required
+                {...register("budget")}
               />
+              {errors.budget && (
+                <p className="text-red-500 text-xs">{errors.budget.message}</p>
+              )}
             </div>
 
             {/* Location */}
             <div className="grid gap-2">
               <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                name="location"
-                value={movie.location}
-                onChange={handleChange}
-                required
-              />
+              <Input id="location" {...register("location")} />
+              {errors.location && (
+                <p className="text-red-500 text-xs">
+                  {errors.location.message}
+                </p>
+              )}
             </div>
 
             {/* Duration */}
             <div className="grid gap-2">
               <Label htmlFor="duration">Duration (minutes)</Label>
-              <Input
-                id="duration"
-                name="duration"
-                type="number"
-                value={movie.duration}
-                onChange={handleChange}
-                required
-              />
+              <Input id="duration" type="number" {...register("duration")} />
+              {errors.duration && (
+                <p className="text-red-500 text-xs">
+                  {errors.duration.message}
+                </p>
+              )}
             </div>
 
             {/* Release Year */}
@@ -190,12 +200,14 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
               <Label htmlFor="releaseYear">Release Year</Label>
               <Input
                 id="releaseYear"
-                name="releaseYear"
                 type="number"
-                value={movie.releaseYear}
-                onChange={handleChange}
-                required
+                {...register("releaseYear")}
               />
+              {errors.releaseYear && (
+                <p className="text-red-500 text-xs">
+                  {errors.releaseYear.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -208,15 +220,12 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
             <Button
               disabled={loading}
               type="submit"
-              className="bg-indigo-600
-              disabled:bg-gray-500
-              disabled:cursor-not-allowed
-              hover:bg-indigo-700 text-white"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:bg-gray-500 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
                   Saving{" "}
-                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white ml-2" />
                 </>
               ) : (
                 "Save Movie"

@@ -1,44 +1,51 @@
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginType } from "@/types/schema";
+
+
+
 export default function Login({ setUser }: { setUser: (user: any) => void }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginType>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (formData: LoginType) => {
     try {
       const res = await fetch("http://localhost:8000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(formData),
         credentials: "include",
       });
+
       const data = await res.json();
-      if (res.ok) {
+
+      if (res.ok && data?.user) {
         toast.success("Login successful!");
         setUser(data.user);
         navigate("/");
       } else {
-        const errors = data.errors
-          ? data.errors.map((err: any) => err.message).join("\n")
-          : "";
-        toast.error(errors || "Login failed!");
+        const errorMsg =
+          data?.errors?.map((err: any) => err.message).join("\n") ||
+          data?.message ||
+          "Login failed!";
+        toast.error(errorMsg);
       }
     } catch (error) {
+      console.error(error);
       toast.error("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -54,41 +61,52 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
           </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Email */}
             <div>
               <label className="text-sm font-medium text-gray-700">Email</label>
               <Input
                 type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
                 placeholder="Enter your email"
                 className="mt-1"
-                required
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
+            {/* Password */}
             <div>
               <label className="text-sm font-medium text-gray-700">
                 Password
               </label>
               <Input
                 type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
                 placeholder="Enter your password"
                 className="mt-1"
-                required
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
+            {/* Submit */}
             <Button
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-              disabled={loading}
+              disabled={isSubmitting}
             >
-              {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Login"}
+              {isSubmitting ? (
+                <Loader2 className="animate-spin h-4 w-4" />
+              ) : (
+                "Login"
+              )}
             </Button>
 
             <p className="text-sm text-center text-gray-500">
