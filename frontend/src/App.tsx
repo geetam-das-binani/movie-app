@@ -6,12 +6,13 @@ import ProtectedRoute from "./Protected/ProtectedRoute";
 import { useEffect, useState } from "react";
 import { ToastContainer } from 'react-toastify';
 import type { UserType } from "./types/user";
+import { BACKEND_URL } from "./url";
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<null | UserType>(null);
   const fetchLoggedUser = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/auth/profile", {
+      const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

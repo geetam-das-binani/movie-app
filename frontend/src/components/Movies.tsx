@@ -26,7 +26,7 @@ export default function Movies({ user }: { user: any }) {
       else setLoading(true);
 
       const response = await fetch(
-        `http://localhost:8000/api/movies?page=${pageNum}`,
+        `${BACKEND_URL}/api/movies?page=${pageNum}`,
         { credentials: "include" }
       );
       const data = await response.json();
