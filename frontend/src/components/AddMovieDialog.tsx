@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { movieSchema, type MovieType } from "@/types/schema";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "@/url";
 
 const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
   const [open, setOpen] = useState(false);
@@ -47,14 +48,16 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
       location: "",
       duration: "",
       releaseYear: "",
+      imageUrl:""
     },
   });
 
   const watchType = watch("type");
   const onSubmit = async (formData: MovieType) => {
+    console.log(formData);
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/movies", {
+      const response = await fetch(`${BACKEND_URL}/api/movies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -134,6 +137,12 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
               {errors.type && (
                 <p className="text-red-500 text-xs">{errors.type.message}</p>
               )}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="imageUrl">Image URL (Optional)</Label>
+              <Input id="imageUrl" {...register("imageUrl")} />
+      
             </div>
 
             {/* Director */}

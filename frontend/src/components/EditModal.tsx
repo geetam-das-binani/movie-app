@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { movieSchema, type MovieType } from "@/types/schema";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "@/url";
 
 const EditModal = ({
   movie,
@@ -54,6 +55,7 @@ const EditModal = ({
       location: "",
       duration: "",
       releaseYear: "",
+      imageUrl: "",
     },
   });
 
@@ -67,6 +69,7 @@ const EditModal = ({
         location: movie.location || "",
         duration: movie.duration?.toString() || "",
         releaseYear: movie.releaseYear?.toString() || "",
+        imageUrl: movie.imageUrl || "",
       });
     }
   }, [movie, reset]);
@@ -76,7 +79,7 @@ const EditModal = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/api/movies/${movie.id}`,
+        `${BACKEND_URL}/api/movies/${movie.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -152,6 +155,12 @@ const EditModal = ({
               {errors.type && (
                 <p className="text-red-500 text-sm">{errors.type.message}</p>
               )}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="imageUrl">Image URL (Optional)</Label>
+              <Input id="imageUrl" {...register("imageUrl")} />
+      
             </div>
 
             {/* Director */}

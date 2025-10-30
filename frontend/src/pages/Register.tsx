@@ -9,6 +9,8 @@ import { registerSchema, type RegisterType } from "@/types/schema";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import type { UserType } from "@/types/user";
+import { BACKEND_URL } from "@/url";
+
 
 export default function Register({
   setUser,
@@ -31,7 +33,7 @@ export default function Register({
     console.log(formData);
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/auth/register", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

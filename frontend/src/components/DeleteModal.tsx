@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "@/url";
 
 
 interface DeleteMovieDialogProps {
@@ -29,7 +30,7 @@ const DeleteModal = ({
   const handleDelete = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:8000/api/movies/${movieId}`, {
+      const res = await fetch(`${BACKEND_URL}/api/movies/${movieId}`, {
         method: "DELETE",
         credentials: "include",
       });

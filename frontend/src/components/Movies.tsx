@@ -5,6 +5,7 @@ import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import ProfileMenu from "./ProfileMenu";
 import type { MovieType } from "@/types/schema";
+import { BACKEND_URL } from "@/url";
 
 export default function Movies({ user }: { user: any }) {
   const [movies, setMovies] = useState<Array<MovieType>>([]);
@@ -161,7 +162,7 @@ export default function Movies({ user }: { user: any }) {
                 <ProfileMenu
                   user={user}
                   onLogout={async () => {
-                    await fetch("http://localhost:8000/api/auth/logout", {
+                    await fetch(`${BACKEND_URL}/api/auth/logout`, {
                       method: "POST",
                       credentials: "include",
                     });
@@ -191,7 +192,7 @@ export default function Movies({ user }: { user: any }) {
           {/* Table */}
           <div
             ref={tableContainerRef}
-            className="overflow-y-scroll max-h-[70vh] border-t"
+            className="overflow-y-scroll max-h-[90vh] border-t"
           >
             {loading && !fetchingMore ? (
               <div className="text-center py-8 text-gray-500">
@@ -213,6 +214,7 @@ export default function Movies({ user }: { user: any }) {
                       "location",
                       "duration",
                       "releaseYear",
+                      "imageUrl",
                     ].map((col) => (
                       <th
                         key={col}
@@ -243,6 +245,17 @@ export default function Movies({ user }: { user: any }) {
                       <td className="px-6 py-3">{movie.location}</td>
                       <td className="px-6 py-3">{movie.duration}</td>
                       <td className="px-6 py-3">{movie.releaseYear}</td>
+                      <td className="px-6 py-3">
+                        {movie.imageUrl ? (
+                          <img
+                            src={movie.imageUrl}
+                            alt={movie.title}
+                            className="w-16 h-16 object-cover rounded-lg border shadow-sm mx-auto sm:w-18 sm:h-18 md:w-20 md:h-20"
+                          />
+                        ) : (
+                          <span className="text-gray-400">No Image</span>
+                        )}
+                      </td>
                       <td className="px-6 py-3">
                         <div className="flex items-center gap-2">
                           <EditModal movie={movie} refetch={refetch} />

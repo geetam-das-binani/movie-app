@@ -24,7 +24,7 @@ export type LoginType = z.infer<typeof loginSchema>;
 
 // ✅ Movie Schema
 export const movieSchema = z.object({
-    id: z.number().optional(), 
+  id: z.number().optional(),
   title: z.string().min(1, "Title is required"),
   type: z.enum(["movie", "tvShow"], { message: "Type is required" }).optional(),
   director: z.string().min(1, "Director is required"),
@@ -41,6 +41,7 @@ export const movieSchema = z.object({
     .refine((val) => !isNaN(parseInt(val)) && parseInt(val) > 0, {
       message: "Duration must be a valid number",
     }),
+  imageUrl: z.string().optional(),
   releaseYear: z
     .string()
     .min(4, "Enter a valid year")

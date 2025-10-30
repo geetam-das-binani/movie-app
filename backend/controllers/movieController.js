@@ -1,9 +1,18 @@
 import { prisma } from "../db/prismaClient.js";
 const createMovie = async (req, res) => {
   try {
-    const { title, director, releaseYear, type, budget, location, duration } =
-      req.body;
-    // const userId = req.user.userId; // from middleware
+    const {
+      title,
+      director,
+      releaseYear,
+      type,
+      budget,
+      location,
+      duration,
+      imageUrl = "",
+    } = req.body;
+    const userId = req.user.userId;
+console.log(req.body);
 
     const movie = await prisma.movie.create({
       data: {
@@ -14,6 +23,8 @@ const createMovie = async (req, res) => {
         budget,
         location,
         duration,
+        userId,
+      ...(imageUrl ? { imageUrl } : {}),
       },
     });
 

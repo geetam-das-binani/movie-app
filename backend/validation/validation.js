@@ -26,4 +26,5 @@ export const movieSchema = z.object({
     .number({ invalid_type_error: "Release year must be a number" })
     .gte(1888, "Invalid release year")
     .lte(new Date().getFullYear(), "Release year can't be in the future"),
+  imageUrl: z.string().url("Image URL must be a valid URL").optional(),
 });

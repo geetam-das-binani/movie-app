@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginType } from "@/types/schema";
 import type { UserType } from "@/types/user";
+import { BACKEND_URL } from "@/url";
 
 export default function Login({
   setUser,
@@ -26,7 +27,7 @@ export default function Login({
 
   const onSubmit = async (formData: LoginType) => {
     try {
-      const res = await fetch("http://localhost:8000/api/auth/login", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
