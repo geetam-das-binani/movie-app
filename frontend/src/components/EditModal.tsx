@@ -25,8 +25,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { movieSchema, type MovieType } from "@/types/schema";
+import { toast } from "react-toastify";
 
-const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
+const EditModal = ({
+  movie,
+  refetch,
+}: {
+  movie: MovieType;
+  refetch: () => void;
+}) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -50,12 +57,11 @@ const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
     },
   });
 
-
   useEffect(() => {
     if (movie) {
       reset({
         title: movie.title || "",
-        type: movie.type || "",
+        type: movie.type || undefined,
         director: movie.director || "",
         budget: movie.budget?.toString() || "",
         location: movie.location || "",
@@ -86,11 +92,12 @@ const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
 
       if (response.ok) {
         refetch();
+        toast.success("Movie updated successfully!");
       } else {
-        console.error("Failed to update movie");
+        toast.error("Failed to update movie.");
       }
     } catch (error) {
-      console.error(error);
+      toast.error("An error occurred while updating the movie.");
     } finally {
       reset();
       setOpen(false);
@@ -130,7 +137,9 @@ const EditModal = ({ movie, refetch }: { movie: any; refetch: () => void }) => {
               <Label htmlFor="type">Type</Label>
               <Select
                 value={watchType}
-                onValueChange={(value:string) => setValue("type", value as MovieType["type"])}
+                onValueChange={(value: string) =>
+                  setValue("type", value as MovieType["type"])
+                }
               >
                 <SelectTrigger id="type" className="w-full">
                   <SelectValue placeholder="Select movie type" />

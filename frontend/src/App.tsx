@@ -5,15 +5,10 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./Protected/ProtectedRoute";
 import { useEffect, useState } from "react";
 import { ToastContainer } from 'react-toastify';
+import type { UserType } from "./types/user";
 const App = () => {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<null | {
-    name: string;
-    email: string;
-    id: number;
-    createdAt: string;
-    updatedAt: string;
-  }>(null);
+  const [user, setUser] = useState<null | UserType>(null);
   const fetchLoggedUser = async () => {
     try {
       const response = await fetch("http://localhost:8000/api/auth/profile", {
@@ -37,6 +32,7 @@ const App = () => {
     }
   };
 
+  
   useEffect(() => {
     fetchLoggedUser();
   }, []);

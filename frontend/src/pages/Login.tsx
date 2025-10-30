@@ -7,10 +7,13 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginType } from "@/types/schema";
+import type { UserType } from "@/types/user";
 
-
-
-export default function Login({ setUser }: { setUser: (user: any) => void }) {
+export default function Login({
+  setUser,
+}: {
+  setUser: (user: UserType) => void;
+}) {
   const navigate = useNavigate();
 
   const {
@@ -35,6 +38,7 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
       if (res.ok && data?.user) {
         toast.success("Login successful!");
         setUser(data.user);
+
         navigate("/");
       } else {
         const errorMsg =
@@ -44,7 +48,6 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
         toast.error(errorMsg);
       }
     } catch (error) {
-      console.error(error);
       toast.error("An error occurred. Please try again.");
     }
   };

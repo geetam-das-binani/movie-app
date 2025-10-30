@@ -70,18 +70,18 @@ const AddMovieDialog = ({ refetch }: { refetch: () => void }) => {
 
       if (response.ok) {
         refetch();
-        toast.success("✅ Movie added successfully!");
+        toast.success("Movie added successfully!");
         reset();
         setOpen(false);
       } else {
         const errors = data.errors
           ? data.errors.map((err: any) => err.message).join("\n")
           : data.message || "Unknown error";
-        toast.success(`❌ Failed to add movie: ${errors}`);
+        toast.error(`Failed to add movie: ${errors}`);
       }
     } catch (error) {
-      console.error(error);
-      toast.success("⚠️ Something went wrong!");
+      
+      toast.error(" Something went wrong!");
     } finally {
       setLoading(false);
     }

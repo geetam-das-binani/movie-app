@@ -8,11 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterType } from "@/types/schema";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import type { UserType } from "@/types/user";
 
 export default function Register({
   setUser,
 }: {
-  setUser: (user: any) => void;
+  setUser: (user: UserType) => void;
 }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,6 @@ export default function Register({
         toast.error(data.message || "Registration failed!");
       }
     } catch (error) {
-      console.error(error);
       toast.error("Something went wrong!");
     } finally {
       setLoading(false);

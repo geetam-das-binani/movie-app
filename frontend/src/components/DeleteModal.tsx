@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-// import { toast } from "sonner";
+import { toast } from "react-toastify";
+
 
 interface DeleteMovieDialogProps {
   movieId: number;
@@ -31,16 +32,15 @@ const DeleteModal = ({
       const res = await fetch(`http://localhost:8000/api/movies/${movieId}`, {
         method: "DELETE",
         credentials: "include",
-       
       });
 
       if (!res.ok) throw new Error("Failed to delete movie");
 
-      //   toast.success(`"${movieTitle}" deleted successfully`);
+      toast.success(`"${movieTitle}" deleted successfully`);
       setOpen(false);
       refetch();
     } catch (err) {
-      //   toast.error("Failed to delete movie. Try again.");
+      toast.success("Failed to delete movie. Try again.");
       console.error(err);
     } finally {
       setLoading(false);

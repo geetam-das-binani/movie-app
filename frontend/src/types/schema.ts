@@ -24,6 +24,7 @@ export type LoginType = z.infer<typeof loginSchema>;
 
 // ✅ Movie Schema
 export const movieSchema = z.object({
+    id: z.number().optional(), 
   title: z.string().min(1, "Title is required"),
   type: z.enum(["movie", "tvShow"], { message: "Type is required" }).optional(),
   director: z.string().min(1, "Director is required"),

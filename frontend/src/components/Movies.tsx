@@ -4,16 +4,17 @@ import AddMovieDialog from "./AddMovieDialog";
 import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import ProfileMenu from "./ProfileMenu";
+import type { MovieType } from "@/types/schema";
 
 export default function Movies({ user }: { user: any }) {
-  const [movies, setMovies] = useState<any[]>([]);
-  const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Array<MovieType>>([]);
+  const [filteredMovies, setFilteredMovies] = useState<Array<MovieType>>([]);
   const [loading, setLoading] = useState(true);
   const [fetchingMore, setFetchingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<string>("title");
+  const [sortField, setSortField] = useState<keyof MovieType>("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +104,6 @@ export default function Movies({ user }: { user: any }) {
       });
     }
 
-    // Sort (client-side)
     result.sort((a, b) => {
       const fieldA = a[sortField];
       const fieldB = b[sortField];
@@ -112,16 +112,20 @@ export default function Movies({ user }: { user: any }) {
         return sortOrder === "asc"
           ? fieldA.localeCompare(fieldB)
           : fieldB.localeCompare(fieldA);
-      } else {
-        return sortOrder === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
+
+      const numA = Number(fieldA);
+      const numB = Number(fieldB);
+      if (isNaN(numA) || isNaN(numB)) return 0;
+
+      return sortOrder === "asc" ? numA - numB : numB - numA;
     });
 
     setFilteredMovies(result);
   }, [movies, search, sortField, sortOrder]);
 
   // Sorting handler
-  const handleSort = (field: string) => {
+  const handleSort = (field: keyof MovieType) => {
     if (field === sortField) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
@@ -150,12 +154,8 @@ export default function Movies({ user }: { user: any }) {
           </h1>
 
           <div className="flex items-center gap-3">
-           
-           
-              <AddMovieDialog refetch={refetch} />
-            
+            <AddMovieDialog refetch={refetch} />
 
-            
             {user && (
               <div className="bg-white rounded-lg shadow-sm">
                 <ProfileMenu
@@ -217,7 +217,7 @@ export default function Movies({ user }: { user: any }) {
                       <th
                         key={col}
                         className="px-6 py-3 text-left cursor-pointer select-none hover:bg-indigo-200 transition"
-                        onClick={() => handleSort(col)}
+                        onClick={() => handleSort(col as keyof MovieType)}
                       >
                         <div className="flex items-center">
                           {col === "releaseYear"
@@ -231,7 +231,7 @@ export default function Movies({ user }: { user: any }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMovies.map((movie) => (
+                  {filteredMovies.map((movie: MovieType) => (
                     <tr
                       key={movie.id}
                       className="border-b hover:bg-gray-50 transition"
@@ -247,7 +247,7 @@ export default function Movies({ user }: { user: any }) {
                         <div className="flex items-center gap-2">
                           <EditModal movie={movie} refetch={refetch} />
                           <DeleteModal
-                            movieId={movie.id}
+                            movieId={movie.id as number}
                             movieTitle={movie.title}
                             refetch={refetch}
                           />
