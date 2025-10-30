@@ -30,36 +30,6 @@ JWT authentication
 
 CORS & cookie-based sessions
 
-📁 Project Structure
-movie-dashboard/
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── movieRoutes.js
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── movieController.js
-│   ├── middleware/
-│   │   ├── authMiddleware.js
-│   ├── index.js
-│   ├── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── types/
-│   │   │   └── schema.ts
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   ├── index.html
-│   ├── vite.config.ts
-│   ├── package.json
-│
-├── README.md
-
 🚀 Setup Instructions
 🔧 Prerequisites
 
@@ -76,10 +46,14 @@ cd movie-dashboard
 cd backend
 npm install
 
-Create .env file inside backend/
+Create .env file inside backend
+
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/moviedb"
+
 JWT_SECRET="your_jwt_secret"
+
 PORT=8000
+
 APP_HOST=frontendhost
 
 Run Prisma migrations and generate client
@@ -104,9 +78,15 @@ npm run dev
 Features
 
 ✅ User Authentication (Register / Login)
+
 ✅ Add / Edit / Delete Movies
+
 ✅ Image URL support
-✅ Paginated Movie List
+
+✅ Infinite Scroll Movie List,Search,Sort
+
 ✅ Zod + React Hook Form validation
+
 ✅ Toast Notifications for actions
+
 ✅ Responsive design using Tailwind & Shadcn UI
